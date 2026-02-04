@@ -1,28 +1,26 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { formatConversion, UnitType } from './src/utils/converter';
 
 export default function App() {
   const [val, setVal] = useState('');
-  const [type, setType] = useState('Length');
+  const [type, setType] = useState<UnitType>('Length');
 
-  const convert = (v: string, t: string) => {
-    const n = parseFloat(v);
-    if (isNaN(n)) return '';
-
-    if (t === 'Length') return `${n} m = ${(n * 3.28084).toFixed(2)} ft`;
-    if (t === 'Weight') return `${n} kg = ${(n * 2.20462).toFixed(2)} lbs`;
-    if (t === 'Temp') return `${n} °C = ${(n * 9 / 5 + 32).toFixed(2)} °F`;
-    if (t === 'Speed') return `${n} km/h = ${(n * 0.621371).toFixed(2)} mph`;
-    return '';
+  const getResult = () => {
+    const n = parseFloat(val);
+    if (isNaN(n)) return '...';
+    return formatConversion(n, type);
   };
+
+  const tabs: UnitType[] = ['Length', 'Weight', 'Temp', 'Speed'];
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Unit Converter Pro 📏</Text>
 
       <View style={styles.tabs}>
-        {['Length', 'Weight', 'Temp', 'Speed'].map(t => (
+        {tabs.map(t => (
           <TouchableOpacity key={t} style={[styles.tab, type === t && styles.activeTab]} onPress={() => setType(t)}>
             <Text style={[styles.tabText, type === t && styles.activeTabText]}>{t}</Text>
           </TouchableOpacity>
@@ -38,7 +36,7 @@ export default function App() {
           value={val}
           onChangeText={setVal}
         />
-        <Text style={styles.result}>{val ? convert(val, type) : '...'}</Text>
+        <Text style={styles.result}>{val ? getResult() : '...'}</Text>
       </View>
 
       <View style={styles.ad}>
